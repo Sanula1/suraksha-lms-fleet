@@ -40,7 +40,7 @@ const Login = () => {
   return <div className="min-h-screen flex">
       {/* Hero Section */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-hero relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20" />
+        
         
         
       </div>
