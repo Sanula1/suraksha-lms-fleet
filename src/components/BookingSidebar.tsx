@@ -1,5 +1,5 @@
-import { Users, Calendar, Settings, User } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { Users, Calendar, Settings, User, QrCode, LogOut, Palette } from "lucide-react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import {
   Sidebar,
@@ -16,20 +16,26 @@ import {
 const mainItems = [
   { title: "Book Hire Students", url: "/booking/students", icon: Users },
   { title: "Book Hire Attendance", url: "/booking/attendance", icon: Calendar },
+  { title: "Mark Attendance", url: "/booking/mark-attendance", icon: QrCode },
 ];
 
 const settingsItems = [
-  { title: "Profile", url: "/booking/profile", icon: User },
-  { title: "Attendance", url: "/booking/attendance-settings", icon: Settings },
+  { title: "Profile", url: "/Profile", icon: User },
+  { title: "Appearance", url: "/booking/appearance", icon: Palette },
 ];
 
 export function BookingSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
 
   const isActive = (path: string) => currentPath === path;
+
+  const handleLogout = () => {
+    navigate("/");
+  };
 
   const getNavClasses = (path: string) => {
     const baseClasses = "flex items-center gap-3 rounded-lg px-3 py-2 transition-smooth";
@@ -88,6 +94,14 @@ export function BookingSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Logout Section */}
+        <div className="mt-auto p-4">
+          <SidebarMenuButton onClick={handleLogout} className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10">
+            <LogOut className="h-4 w-4" />
+            {!collapsed && <span>Logout</span>}
+          </SidebarMenuButton>
+        </div>
       </SidebarContent>
     </Sidebar>
   );

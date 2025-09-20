@@ -1,5 +1,5 @@
-import { Bus, Settings, User, Calendar } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { Bus, Settings, User, Calendar, LogOut } from "lucide-react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import {
   Sidebar,
@@ -26,7 +26,12 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
+
+  const handleLogout = () => {
+    navigate("/");
+  };
 
   const isActive = (path: string) => {
     if (path === "/dashboard") {
@@ -92,6 +97,14 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Logout Section */}
+        <div className="mt-auto p-4">
+          <SidebarMenuButton onClick={handleLogout} className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10">
+            <LogOut className="h-4 w-4" />
+            {!collapsed && <span>Logout</span>}
+          </SidebarMenuButton>
+        </div>
       </SidebarContent>
     </Sidebar>
   );
