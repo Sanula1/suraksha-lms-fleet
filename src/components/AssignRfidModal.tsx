@@ -29,13 +29,18 @@ export function AssignRfidModal({ isOpen, onClose, onSuccess }: AssignRfidModalP
 
     setIsSubmitting(true);
     try {
-      await ApiService.assignRfid(formData);
-      toast.success('Successfully Assign Rfid for user');
-      setFormData({ userId: '', userRfid: '' });
-      onSuccess();
+      const response = await ApiService.assignRfid(formData);
+      
+      if (response.success) {
+        toast.success('Successfully Assign Rfid for user');
+        setFormData({ userId: '', userRfid: '' });
+        onSuccess();
+      } else {
+        toast.error(response.message || 'RFID registered unsuccessfully');
+      }
     } catch (error) {
       console.error('Error assigning RFID:', error);
-      toast.error('Failed to assign RFID');
+      toast.error('RFID registered unsuccessfully');
     } finally {
       setIsSubmitting(false);
     }
