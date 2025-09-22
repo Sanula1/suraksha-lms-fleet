@@ -119,7 +119,7 @@ export function AssignRfidModal({ isOpen, onClose, onSuccess }: AssignRfidModalP
       </DialogContent>
 
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="z-[60]">
           <AlertDialogHeader>
             <AlertDialogTitle>{alertTitle}</AlertDialogTitle>
             <AlertDialogDescription>

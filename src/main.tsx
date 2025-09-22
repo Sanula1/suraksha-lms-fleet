@@ -14,7 +14,56 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
+
+        {/* Admin routes */}
         <Route path="/admin" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+
+        {/* Section routes */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/user-management" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/institutes" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/subjects" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/subject-lectures" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/transport" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/assign-rfid" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/classes" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/payments" element={
           <ProtectedRoute>
             <AdminDashboard />
           </ProtectedRoute>

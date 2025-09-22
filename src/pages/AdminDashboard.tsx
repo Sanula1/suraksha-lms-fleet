@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '@/components/AdminSidebar';
 import { StatsCards } from '@/components/StatsCards';
 import { UserManagement } from '@/components/UserManagement';
@@ -16,6 +16,37 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [adminUser, setAdminUser] = useState<any>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Map tabs to routes and vice versa
+  const tabToPath: Record<string, string> = {
+    dashboard: '/dashboard',
+    users: '/user-management',
+    institutes: '/institutes',
+    subjects: '/subjects',
+    lectures: '/subject-lectures',
+    transport: '/transport',
+    'assign-rfid': '/assign-rfid',
+    classes: '/classes',
+    payments: '/payments',
+    settings: '/settings',
+  };
+
+  const pathToTab = (pathname: string): string => {
+    switch (pathname) {
+      case '/dashboard': return 'dashboard';
+      case '/user-management': return 'users';
+      case '/institutes': return 'institutes';
+      case '/subjects': return 'subjects';
+      case '/subject-lectures': return 'lectures';
+      case '/transport': return 'transport';
+      case '/assign-rfid': return 'assign-rfid';
+      case '/classes': return 'classes';
+      case '/payments': return 'payments';
+      case '/settings': return 'settings';
+      default: return 'dashboard';
+    }
+  };
 
   useEffect(() => {
     const user = ApiService.getCurrentUser();
@@ -24,7 +55,17 @@ export default function AdminDashboard() {
       return;
     }
     setAdminUser(user);
-  }, [navigate]);
+
+    // If at /admin root, redirect to /dashboard for consistency
+    if (location.pathname === '/admin') {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [navigate, location.pathname]);
+
+  // Sync tab with current route
+  useEffect(() => {
+    setActiveTab(pathToTab(location.pathname));
+  }, [location.pathname]);
 
   const handleLogout = () => {
     ApiService.logout();
@@ -161,7 +202,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-background">
       <AdminSidebar 
         activeTab={activeTab} 
-        onTabChange={setActiveTab}
+        onTabChange={(tab) => navigate(tabToPath[tab] ?? '/dashboard')}
         onLogout={handleLogout}
         adminUser={{
           name: `${adminUser.firstName} ${adminUser.lastName}`,
