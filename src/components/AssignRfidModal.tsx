@@ -30,7 +30,7 @@ export function AssignRfidModal({ isOpen, onClose, onSuccess }: AssignRfidModalP
     setIsSubmitting(true);
     try {
       await ApiService.assignRfid(formData);
-      toast.success('RFID assigned successfully');
+      toast.success('Successfully Assign Rfid for user');
       setFormData({ userId: '', userRfid: '' });
       onSuccess();
     } catch (error) {

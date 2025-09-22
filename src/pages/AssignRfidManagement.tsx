@@ -9,7 +9,7 @@ export function AssignRfidManagement() {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
   const handleAssignSuccess = () => {
-    toast.success('RFID assigned successfully');
+    toast.success('Successfully Assign Rfid for user');
     setIsAssignModalOpen(false);
   };
 
