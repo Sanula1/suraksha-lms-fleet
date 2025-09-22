@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import ApiService from '@/services/api';
 
 interface AssignRfidModalProps {
@@ -18,29 +18,44 @@ export function AssignRfidModal({ isOpen, onClose, onSuccess }: AssignRfidModalP
     userRfid: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertDescription, setAlertDescription] = useState('');
+  const [isSuccessAlert, setIsSuccessAlert] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.userId || !formData.userRfid) {
-      toast.error('Please fill in all fields');
+      setAlertTitle('Validation error');
+      setAlertDescription('Please fill in all fields');
+      setIsSuccessAlert(false);
+      setAlertOpen(true);
       return;
     }
 
     setIsSubmitting(true);
     try {
       const response = await ApiService.assignRfid(formData);
-      
-      if (response.success) {
-        toast.success('Successfully Assign Rfid for user');
+
+      if (response?.success) {
+        setAlertTitle('Success');
+        setAlertDescription(response.message || 'RFID registered successfully');
+        setIsSuccessAlert(true);
+        setAlertOpen(true);
         setFormData({ userId: '', userRfid: '' });
-        onSuccess();
       } else {
-        toast.error(response.message || 'RFID registered unsuccessfully');
+        setAlertTitle('Unsuccessful');
+        setAlertDescription(response?.message || 'RFID registered unsuccessfully');
+        setIsSuccessAlert(false);
+        setAlertOpen(true);
       }
     } catch (error) {
       console.error('Error assigning RFID:', error);
-      toast.error('RFID registered unsuccessfully');
+      setAlertTitle('Unsuccessful');
+      setAlertDescription('RFID registered unsuccessfully');
+      setIsSuccessAlert(false);
+      setAlertOpen(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -102,6 +117,29 @@ export function AssignRfidModal({ isOpen, onClose, onSuccess }: AssignRfidModalP
           </div>
         </form>
       </DialogContent>
+
+      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{alertTitle}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {alertDescription}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => {
+                setAlertOpen(false);
+                if (isSuccessAlert) {
+                  onSuccess();
+                }
+              }}
+            >
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }

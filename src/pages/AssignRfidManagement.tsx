@@ -3,13 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Plus } from 'lucide-react';
 import { AssignRfidModal } from '@/components/AssignRfidModal';
-import { toast } from 'sonner';
+
 
 export function AssignRfidManagement() {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
   const handleAssignSuccess = () => {
-    toast.success('Successfully Assign Rfid for user');
     setIsAssignModalOpen(false);
   };
 
