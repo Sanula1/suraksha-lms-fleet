@@ -117,8 +117,7 @@ const CreateOrganizationLectureForm = ({ courseId, onSuccess, onCancel }: Create
       const response = await fetch(`${baseUrl2}/organization/api/v1/lectures/with-documents/${formData.causeId}`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('org_access_token')}`,
-          'ngrok-skip-browser-warning': 'true'
+          'Authorization': `Bearer ${localStorage.getItem('org_access_token')}`
         },
         body: fd,
       });
