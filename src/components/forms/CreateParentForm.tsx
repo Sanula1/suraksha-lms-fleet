@@ -56,8 +56,8 @@ const CreateParentForm = ({ onSubmit, onCancel, initialData }: CreateParentFormP
     educationLevel: initialData?.educationLevel || ''
   });
 
-  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(
-    initialData?.user?.dateOfBirth ? new Date(initialData.user.dateOfBirth) : null
+  const [dateOfBirth, setDateOfBirth] = useState<dayjs.Dayjs | null>(
+    initialData?.user?.dateOfBirth ? dayjs(initialData.user.dateOfBirth) : null
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -302,9 +302,14 @@ const CreateParentForm = ({ onSubmit, onCancel, initialData }: CreateParentFormP
                   <div className="mt-2">
                     <DatePicker 
                       value={dateOfBirth}
-                      onChange={setDateOfBirth}
-                      placeholder="Select date of birth"
-                      style={{ width: '100%', height: '48px' }}
+                      onChange={(newDate) => setDateOfBirth(newDate)}
+                      label="Select date of birth"
+                      slotProps={{
+                        textField: {
+                          placeholder: "Select date of birth",
+                          style: { width: '100%', height: '48px' }
+                        }
+                      }}
                     />
                   </div>
                 </div>

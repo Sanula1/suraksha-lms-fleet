@@ -191,10 +191,15 @@ const CreateTeacherForm = ({ onSubmit, onCancel, initialData }: CreateTeacherFor
                       <FormLabel className="text-sm font-medium">Join Date</FormLabel>
                       <FormControl>
                         <DatePicker 
-                          value={field.value ? new Date(field.value) : null}
-                          onChange={(date) => field.onChange(date ? date.toISOString().split('T')[0] : '')}
-                          placeholder="Select join date"
-                          style={{ width: '100%', height: '40px' }}
+                          value={field.value ? dayjs(field.value) : null}
+                          onChange={(date) => field.onChange(date ? date.format('YYYY-MM-DD') : '')}
+                          label="Select join date"
+                          slotProps={{
+                            textField: {
+                              placeholder: "Select join date",
+                              style: { width: '100%', height: '40px' }
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormMessage />

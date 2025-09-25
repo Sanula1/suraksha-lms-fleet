@@ -24,7 +24,7 @@ const CreateStudentForm: React.FC<CreateStudentFormProps> = ({
   onCancel,
   loading = false
 }) => {
-  const [date, setDate] = useState<Date | null>(null);
+  const [date, setDate] = useState<dayjs.Dayjs | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -207,9 +207,14 @@ const CreateStudentForm: React.FC<CreateStudentFormProps> = ({
                     <div className="mt-2">
                       <DatePicker 
                         value={date}
-                        onChange={setDate}
-                        placeholder="Select date of birth"
-                        style={{ width: '100%', height: '48px' }}
+                        onChange={(newDate) => setDate(newDate)}
+                        label="Select date of birth"
+                        slotProps={{
+                          textField: {
+                            placeholder: "Select date of birth",
+                            style: { width: '100%', height: '48px' }
+                          }
+                        }}
                       />
                     </div>
                   </div>

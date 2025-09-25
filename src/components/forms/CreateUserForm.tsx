@@ -47,8 +47,8 @@ const CreateUserForm = ({ onSubmit, onCancel, loading = false, initialData }: Cr
   };
 
   // Add dateOfBirth state
-  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(
-    initialData?.dateOfBirth ? new Date(initialData.dateOfBirth) : null
+  const [dateOfBirth, setDateOfBirth] = useState<dayjs.Dayjs | null>(
+    initialData?.dateOfBirth ? dayjs(initialData.dateOfBirth) : null
   );
 
   const [formData, setFormData] = useState({
@@ -236,9 +236,14 @@ const CreateUserForm = ({ onSubmit, onCancel, loading = false, initialData }: Cr
                     <div className="mt-2">
                       <DatePicker 
                         value={dateOfBirth}
-                        onChange={setDateOfBirth}
-                        placeholder="Select date of birth"
-                        style={{ width: '100%', height: '48px' }}
+                        onChange={(newDate) => setDateOfBirth(newDate)}
+                        label="Select date of birth"
+                        slotProps={{
+                          textField: {
+                            placeholder: "Select date of birth",
+                            style: { width: '100%', height: '48px' }
+                          }
+                        }}
                       />
                     </div>
                   </div>
