@@ -54,9 +54,14 @@ export const getAttendanceUrl = (): string => {
 
 export const getApiHeaders = (): Record<string, string> => {
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true'
+    'Content-Type': 'application/json'
   };
+
+  // Only add ngrok header for tunnel URLs (ngrok, localtunnel, etc.)
+  const baseUrl = getBaseUrl();
+  if (baseUrl.includes('ngrok') || baseUrl.includes('localtunnel') || baseUrl.includes('tunnel')) {
+    headers['ngrok-skip-browser-warning'] = 'true';
+  }
 
   // Always get token from localStorage for API calls
   const token = localStorage.getItem('access_token');
@@ -76,12 +81,18 @@ export const loginUser = async (credentials: LoginCredentials): Promise<ApiRespo
   
   console.log('Attempting login with credentials:', { email: credentials.email });
   
+  const loginHeaders: Record<string, string> = {
+    'Content-Type': 'application/json'
+  };
+  
+  // Only add ngrok header for tunnel URLs
+  if (baseUrl.includes('ngrok') || baseUrl.includes('localtunnel') || baseUrl.includes('tunnel')) {
+    loginHeaders['ngrok-skip-browser-warning'] = 'true';
+  }
+
   const response = await fetch(`${baseUrl}/auth/login`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'ngrok-skip-browser-warning': 'true'
-    },
+    headers: loginHeaders,
     body: JSON.stringify(credentials)
   });
 
