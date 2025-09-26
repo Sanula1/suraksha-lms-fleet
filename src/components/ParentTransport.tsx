@@ -142,7 +142,7 @@ const ParentTransport = () => {
           </CardContent>
         </Card>}
 
-      {!loading && !error && enrollments.length > 0 && <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      {!loading && !error && enrollments.length > 0 && <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
           {enrollments.map(enrollment => {
             const isExpanded = expandedCards.has(enrollment._id);
             
@@ -157,17 +157,21 @@ const ParentTransport = () => {
             };
 
             return (
-              <div key={enrollment._id} className="relative flex w-80 flex-col rounded-xl bg-card text-card-foreground shadow-md transition-all duration-200 hover:shadow-lg">
+              <div key={enrollment._id} className="relative flex w-full max-w-sm mx-auto flex-col rounded-xl bg-card text-card-foreground shadow-md transition-all duration-200 hover:shadow-lg mb-8">
                 {/* Image/Gradient Header */}
                 <div className="relative mx-4 -mt-6 h-40 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-primary/80 bg-clip-border text-white shadow-lg shadow-primary/40">
-                  {enrollment.bookhireId.imageUrl && (
-                    <img 
-                      src={enrollment.bookhireId.imageUrl} 
-                      alt={enrollment.bookhireId.title}
-                      className="w-full h-full object-cover"
-                    />
+                  {enrollment.bookhireId.imageUrl ? (
+                    <>
+                      <img 
+                        src={enrollment.bookhireId.imageUrl} 
+                        alt={enrollment.bookhireId.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                    </>
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-r from-primary to-primary/80"></div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10"></div>
                 </div>
                 
                 {/* Content */}
