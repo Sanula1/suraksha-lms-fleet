@@ -11,10 +11,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { instituteClassesApi, InstituteClassCreateData } from '@/api/instituteClasses.api.ts';
 import { Loader2 } from 'lucide-react';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const updateClassSchema = z.object({
   instituteId: z.string().min(1, 'Institute ID is required'),
@@ -291,17 +292,31 @@ const UpdateClassForm: React.FC<UpdateClassFormProps> = ({ classData, onSubmit, 
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Start Date</FormLabel>
-                <FormControl>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="Start Date"
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(date) => field.onChange(date ? date.format('YYYY-MM-DD') : '')}
-                      views={['year', 'month', 'day']}
-                      sx={{ width: '100%' }}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {field.value ? format(new Date(field.value), "PPP") : <span>Start Date</span>}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
                     />
-                  </LocalizationProvider>
-                </FormControl>
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}
@@ -313,17 +328,31 @@ const UpdateClassForm: React.FC<UpdateClassFormProps> = ({ classData, onSubmit, 
             render={({ field }) => (
               <FormItem>
                 <FormLabel>End Date</FormLabel>
-                <FormControl>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="End Date"
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(date) => field.onChange(date ? date.format('YYYY-MM-DD') : '')}
-                      views={['year', 'month', 'day']}
-                      sx={{ width: '100%' }}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {field.value ? format(new Date(field.value), "PPP") : <span>End Date</span>}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
                     />
-                  </LocalizationProvider>
-                </FormControl>
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}

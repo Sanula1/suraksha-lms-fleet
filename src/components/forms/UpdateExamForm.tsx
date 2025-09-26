@@ -8,10 +8,11 @@ import { Card, CardContent } from '../ui/card';
 import { toast } from '../ui/use-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import { getBaseUrl, getApiHeaders } from '../../contexts/utils/auth.api';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface UpdateExamFormProps {
   exam: any;
@@ -204,15 +205,29 @@ export const UpdateExamForm: React.FC<UpdateExamFormProps> = ({ exam, onClose, o
 
             <div className="space-y-2">
               <Label htmlFor="examDate">Exam Date *</Label>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Exam Date"
-                  value={formData.examDate ? dayjs(formData.examDate) : null}
-                  onChange={(date) => handleInputChange('examDate', date ? date.format('YYYY-MM-DD') : '')}
-                  views={['year', 'month', 'day']}
-                  sx={{ width: '100%' }}
-                />
-              </LocalizationProvider>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !formData.examDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.examDate ? format(new Date(formData.examDate), "PPP") : <span>Exam Date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={formData.examDate ? new Date(formData.examDate) : undefined}
+                    onSelect={(date) => handleInputChange('examDate', date ? format(date, 'yyyy-MM-dd') : '')}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="space-y-2">

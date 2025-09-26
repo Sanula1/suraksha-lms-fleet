@@ -7,10 +7,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { studentsApi } from '@/api/students.api';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 interface CreateStudentFormProps {
@@ -24,7 +25,7 @@ const CreateStudentForm: React.FC<CreateStudentFormProps> = ({
   onCancel,
   loading = false
 }) => {
-  const [date, setDate] = useState<dayjs.Dayjs | null>(null);
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -205,17 +206,32 @@ const CreateStudentForm: React.FC<CreateStudentFormProps> = ({
                   <div>
                     <Label className="text-base font-semibold">Date of Birth *</Label>
                     <div className="mt-2">
-                      <DatePicker 
-                        value={date}
-                        onChange={(newDate) => setDate(newDate)}
-                        label="Select date of birth"
-                        slotProps={{
-                          textField: {
-                            placeholder: "Select date of birth",
-                            style: { width: '100%', height: '48px' }
-                          }
-                        }}
-                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full h-12 justify-start text-left font-normal",
+                              !date && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {date ? format(date, "PPP") : <span>Select date of birth</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={setDate}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1900-01-01")
+                            }
+                            initialFocus
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </div>
                   <div>
