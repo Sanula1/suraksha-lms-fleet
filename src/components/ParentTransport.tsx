@@ -57,8 +57,8 @@ const ParentTransport = () => {
       });
       setEnrollments(response.enrollments);
 
-      // Set first active enrollment as selected by default
-      const activeEnrollment = response.enrollments.find(e => e.status === 'ACTIVE');
+      // Set first active/approved enrollment as selected by default
+      const activeEnrollment = response.enrollments.find(e => e.status === 'ACTIVE' || e.status === 'APPROVED');
       if (activeEnrollment) {
         setSelectedTransport(activeEnrollment);
       }
@@ -72,6 +72,7 @@ const ParentTransport = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ACTIVE':
+      case 'APPROVED':
         return 'default';
       case 'PENDING':
         return 'secondary';
@@ -157,8 +158,16 @@ const ParentTransport = () => {
 
             return (
               <div key={enrollment._id} className="relative flex w-80 flex-col rounded-xl bg-card text-card-foreground shadow-md transition-all duration-200 hover:shadow-lg">
-                {/* Gradient Header */}
+                {/* Image/Gradient Header */}
                 <div className="relative mx-4 -mt-6 h-40 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-primary/80 bg-clip-border text-white shadow-lg shadow-primary/40">
+                  {enrollment.bookhireId.imageUrl && (
+                    <img 
+                      src={enrollment.bookhireId.imageUrl} 
+                      alt={enrollment.bookhireId.title}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10"></div>
                 </div>
                 
                 {/* Content */}
