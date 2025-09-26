@@ -24,23 +24,29 @@ const Transport = () => {
   const [dialogTransport, setDialogTransport] = useState<TransportEnrollment | null>(null);
   const [enrollmentDialogOpen, setEnrollmentDialogOpen] = useState(false);
   useEffect(() => {
-    // For demo purposes, use hardcoded studentId = "3"
-    // In real app, use user?.id when user?.userType === 'STUDENT'
-    loadTransportEnrollments();
-  }, []);
-  const loadTransportEnrollments = async () => {
+    // Use the logged-in user's ID for loading transport enrollments
+    if (user?.id) {
+      loadTransportEnrollments(user.id);
+    }
+  }, [user?.id]);
+  const loadTransportEnrollments = async (studentId?: string) => {
+    const id = studentId || user?.id;
+    if (!id) {
+      setError('No user ID available');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      // Using hardcoded studentId "3" for demo
-      const response = await getStudentTransportEnrollments("3", {
+      const response = await getStudentTransportEnrollments(id, {
         page: 1,
         limit: 10
       });
       setEnrollments(response.enrollments);
 
-      // Set first active enrollment as selected by default
-      const activeEnrollment = response.enrollments.find(e => e.status === 'ACTIVE');
+      // Set first active/approved enrollment as selected by default
+      const activeEnrollment = response.enrollments.find(e => e.status === 'ACTIVE' || e.status === 'APPROVED');
       if (activeEnrollment) {
         setSelectedTransport(activeEnrollment);
       }
@@ -54,6 +60,7 @@ const Transport = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ACTIVE':
+      case 'APPROVED':
         return 'default';
       case 'PENDING':
         return 'secondary';
@@ -79,58 +86,154 @@ const Transport = () => {
         </div>
       </div>
 
+      <p className="text-muted-foreground">
+        Manage your transportation services and view enrollment details
+      </p>
+
+      {/* Loading/Error States */}
+      {loading && (
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading transport services...</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {error && (
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center space-y-4">
+              <AlertCircle className="h-12 w-12 mx-auto text-destructive" />
+              <h3 className="text-lg font-semibold">Error Loading Transport</h3>
+              <p className="text-muted-foreground">{error}</p>
+              <Button onClick={() => loadTransportEnrollments()}>
+                Try Again
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* No Transport Message */}
+      {!loading && !error && enrollments.length === 0 && (
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center space-y-4">
+              <Bus className="h-16 w-16 mx-auto text-muted-foreground" />
+              <h3 className="text-xl font-semibold">No Transport Services Found</h3>
+              <p className="text-muted-foreground">
+                You are not enrolled in any transport services yet.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Transport Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {enrollments.map(enrollment => {
-        const openDialog = () => {
-          setDialogTransport(enrollment);
-          setDialogOpen(true);
-        };
-        return <div key={enrollment._id} className="relative flex w-80 flex-col rounded-xl bg-card text-card-foreground shadow-md transition-all duration-200 hover:shadow-lg">
-              {/* Gradient Header */}
-              <div className="relative mx-4 -mt-6 h-40 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-primary/80 bg-clip-border text-white shadow-lg shadow-primary/40">
-              </div>
-              
-              {/* Content */}
-              <div className="p-6">
-                <div className="space-y-4">
-                  {/* Basic Info - Always Visible */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-center text-lg font-semibold">
-                      {enrollment.bookhireId.vehicleNumber}
+      {!loading && !error && enrollments.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          {enrollments.map(enrollment => {
+            const openDialog = () => {
+              setDialogTransport(enrollment);
+              setDialogOpen(true);
+            };
+            
+            return (
+              <div key={enrollment._id} className="relative flex w-full max-w-sm mx-auto flex-col rounded-xl bg-card text-card-foreground shadow-md transition-all duration-200 hover:shadow-lg mb-8">
+                {/* Image/Gradient Header */}
+                <div className="relative mx-4 -mt-6 h-40 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-primary/80 bg-clip-border text-white shadow-lg shadow-primary/40">
+                  {enrollment.bookhireId.imageUrl ? (
+                    <>
+                      <img 
+                        src={enrollment.bookhireId.imageUrl} 
+                        alt={enrollment.bookhireId.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                    </>
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-r from-primary to-primary/80"></div>
+                  )}
+                  
+                  {/* Status Badge Overlay */}
+                  <div className="absolute top-3 right-3">
+                    <Badge variant={getStatusColor(enrollment.status)} className="bg-white/20 backdrop-blur-sm border-white/30">
+                      {enrollment.status}
+                    </Badge>
+                  </div>
+                </div>
+                
+                {/* Content */}
+                <div className="p-6">
+                  <div className="space-y-4">
+                    {/* Basic Info */}
+                    <div className="space-y-2 text-center">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        {enrollment.bookhireId.title}
+                      </h3>
+                      <div className="text-base font-medium text-primary">
+                        {enrollment.bookhireId.vehicleNumber}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {enrollment.bookhireId.year} • Capacity: {enrollment.bookhireId.capacity}
+                      </div>
+                      <div className="text-sm font-medium">
+                        {enrollment.bookhireId.route}
+                      </div>
                     </div>
-                    <div className="text-center text-muted-foreground">
-                      ({enrollment.bookhireId.year})
+
+                    {/* Owner Info */}
+                    <div className="bg-muted/50 p-3 rounded-lg space-y-1">
+                      <div className="text-sm font-medium">{enrollment.ownerId.ownerName}</div>
+                      <div className="text-sm text-muted-foreground">{enrollment.ownerId.businessName}</div>
+                      <div className="text-sm text-muted-foreground flex items-center">
+                        <Phone className="h-3 w-3 mr-1" />
+                        {enrollment.ownerId.phoneNumber}
+                      </div>
                     </div>
-                    <div className="text-center font-medium">
-                      {enrollment.bookhireId.route}
-                    </div>
-                    <div className="text-center">
-                      {enrollment.ownerId.ownerName}
-                    </div>
-                    <div className="text-center text-muted-foreground">
-                      {enrollment.ownerId.phoneNumber}
+
+                    {/* Quick Info */}
+                    <div className="bg-primary/10 p-3 rounded-lg">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Monthly Fee:</span>
+                        <span className="font-bold text-primary">Rs. {enrollment.monthlyFee.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm mt-1">
+                        <span className="text-muted-foreground">Pickup:</span>
+                        <span className="font-medium">{enrollment.pickupTime}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
+                
+                {/* Footer with Buttons */}
+                <div className="p-6 pt-0 space-y-2">
+                  <Button 
+                    variant="outline" 
+                    className="w-full rounded-lg py-3 px-6 text-xs font-bold uppercase shadow-md transition-all hover:shadow-lg" 
+                    onClick={openDialog}
+                  >
+                    View Details
+                  </Button>
+                  <Button 
+                    className="w-full rounded-lg py-3 px-6 text-xs font-bold uppercase shadow-md transition-all hover:shadow-lg" 
+                    onClick={() => {
+                      setSelectedTransport(enrollment);
+                      localStorage.setItem('selectedTransport', JSON.stringify(enrollment));
+                      navigateToPage('transport-selection');
+                    }}
+                  >
+                    Manage Transport
+                  </Button>
+                </div>
               </div>
-              
-              {/* Footer with Buttons */}
-              <div className="p-6 pt-0 space-y-2">
-                <Button variant="outline" className="w-full rounded-lg py-3 px-6 text-xs font-bold uppercase shadow-md transition-all hover:shadow-lg" onClick={openDialog}>
-                  Show More
-                </Button>
-                <Button className="w-full rounded-lg py-3 px-6 text-xs font-bold uppercase shadow-md transition-all hover:shadow-lg" onClick={() => {
-              setSelectedTransport(enrollment);
-              localStorage.setItem('selectedTransport', JSON.stringify(enrollment));
-              navigateToPage('transport-selection');
-            }}>
-                  Select Transport
-                </Button>
-              </div>
-            </div>;
-      })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Transport Details Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -267,10 +370,14 @@ const Transport = () => {
       </Dialog>
 
       {/* Transport Enrollment Dialog */}
-      <TransportEnrollmentDialog open={enrollmentDialogOpen} onOpenChange={setEnrollmentDialogOpen} onEnrollmentSuccess={() => {
-      // Reload transport enrollments after successful enrollment
-      loadTransportEnrollments();
-    }} />
+      <TransportEnrollmentDialog 
+        open={enrollmentDialogOpen} 
+        onOpenChange={setEnrollmentDialogOpen} 
+        onEnrollmentSuccess={() => {
+          // Reload transport enrollments after successful enrollment
+          loadTransportEnrollments();
+        }} 
+      />
     </div>;
 };
 export default Transport;
